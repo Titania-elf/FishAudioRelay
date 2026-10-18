@@ -1,0 +1,17 @@
+{
+  "name": "private-fish-audio-relay",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Fish Audio TTS relay for SillyTavern on Windows",
+  "license": "MIT",
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  }
+}

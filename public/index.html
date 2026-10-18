@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Fish Audio · 本机语音中转</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">≈</span>
+          <div><p class="eyebrow">FISH AUDIO RELAY</p><h1>本机语音中转</h1></div>
+        </div>
+        <div class="status-pill" id="connection-status" role="status"><span class="status-dot" aria-hidden="true"></span><span id="connection-label">正在读取配置</span></div>
+      </header>
+
+      <p class="page-intro">配置一次，让酒馆通过本机中转使用 Fish Audio 语音。</p>
+      <div id="page-message" class="message" role="status" aria-live="polite" hidden></div>
+
+      <div class="workspace">
+        <section class="card configuration" aria-labelledby="configuration-title">
+          <div class="card-heading"><div><p class="eyebrow">01 / CONFIGURATION</p><h2 id="configuration-title">服务配置</h2></div><span class="card-tag">本机保存</span></div>
+          <form id="config-form">
+            <fieldset id="config-fields" disabled>
+              <div class="field">
+                <label for="provider">接入方式</label>
+                <select id="provider"><option value="web">网页订阅 · 使用已登录的 Fish 账号</option><option value="api">API Key · 按 API 余额计费</option></select>
+              </div>
+              <div class="field" id="web-settings" hidden>
+                <div class="label-line"><label>Fish 网页连接</label><span id="browser-status" class="small-status">未连接</span></div>
+                <p><a id="browser-bookmark" class="button button-primary" href="#" draggable="true">连接 Fish 订阅</a></p>
+                <ol class="field-note"><li>按 Ctrl+Shift+B 显示 Chrome 书签栏，将上面的按钮拖到书签栏。</li><li>在常用 Chrome 打开已登录的 <a href="https://fish.audio/app/text-to-speech" target="_blank" rel="noreferrer">Fish 文字转语音页面</a>，点击这个书签。</li><li>保持 Fish 标签页和弹出的连接窗口打开，团队空间可以直接使用。</li></ol>
+                <button id="check-browser" type="button" class="button button-secondary button-small">读取订阅额度</button>
+                <p id="browser-detail" class="field-note" role="status"></p>
+              </div>
+              <div class="field" id="api-settings">
+                <div class="label-line"><label for="fish-api-key">Fish Audio API Key</label><span id="key-status" class="small-status">读取中</span></div>
+                <input id="fish-api-key" name="fishApiKey" type="password" autocomplete="new-password" placeholder="输入 Fish Audio API Key" spellcheck="false">
+                <p class="field-note">保存后不再显示真实 KEY；留空会保留当前 KEY。</p>
+              </div>
+              <div class="field">
+                <label for="model">默认模型</label>
+                <input id="model" name="model" list="model-options" required maxlength="100" autocomplete="off" placeholder="s2.1-pro" spellcheck="false">
+                <datalist id="model-options"><option value="s2.1-pro"></option><option value="drama-3"></option><option value="s2-pro"></option><option value="s1"></option></datalist>
+                <p class="field-note">可选 s2.1-pro、drama-3、s2-pro、s1。S2.1 Pro 与 Drama 3 均已通过当前账号的订阅生成实测。</p>
+              </div>
+
+              <div class="section-divider"></div>
+              <div class="section-heading"><div><h3>音色映射</h3><p class="field-note">用简短别名在酒馆中选择音色。</p></div><button id="add-voice" class="button button-secondary button-small" type="button"><span aria-hidden="true">＋</span> 添加音色</button></div>
+              <div class="voice-table-head" aria-hidden="true"><span>音色别名</span><span>Reference ID</span><span></span></div>
+              <div id="voice-rows" class="voice-rows"></div>
+              <p class="field-note voice-help">别名仅使用字母、数字、下划线或连字符。网页订阅需要填写音色页面地址中的 32 位 Reference ID。</p>
+              <div class="field default-voice-field"><label for="default-voice">默认音色</label><select id="default-voice" name="defaultVoice" required></select></div>
+              <div class="form-footer"><span id="save-note" class="field-note">配置加载后即可编辑</span><button id="save-button" type="submit" class="button button-primary">保存配置</button></div>
+            </fieldset>
+          </form>
+        </section>
+
+        <div class="side-column">
+          <section class="card" aria-labelledby="preview-title">
+            <div class="card-heading"><div><p class="eyebrow">02 / VOICE PREVIEW</p><h2 id="preview-title">听听效果</h2></div><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
+            <form id="preview-form">
+              <fieldset id="preview-fields" disabled>
+                <div class="field"><div class="label-line"><label for="preview-text">试听文本</label><span id="text-count" class="field-note">0 字</span></div><textarea id="preview-text" name="input" rows="3" required placeholder="写一小段话，试试喜欢的声音。">你好，欢迎使用 Fish Audio 语音中转。愿每一段故事，都有属于自己的声音。</textarea></div>
+                <div class="preview-controls">
+                  <div class="field"><label for="preview-voice">试听音色</label><select id="preview-voice" name="voice" required></select></div>
+                  <div class="field"><div class="label-line"><label for="preview-speed">语速</label><output id="speed-value" for="preview-speed">1.00×</output></div><input id="preview-speed" name="speed" type="range" min="0.5" max="2" step="0.05" value="1"><div class="range-labels"><span>慢</span><span>快</span></div></div>
+                </div>
+                <div class="preview-footer"><button id="preview-button" class="button button-primary" type="submit"><span aria-hidden="true">▶</span> 生成试听</button><p class="field-note" id="billing-note">使用已保存配置</p></div>
+              </fieldset>
+            </form>
+            <div id="preview-message" class="message compact-message" role="status" aria-live="polite" hidden></div>
+            <div id="audio-result" class="audio-result" hidden><audio id="preview-audio" controls preload="metadata"></audio><a id="download-audio" class="download-link" download="fish-audio-preview.mp3">下载 MP3 <span aria-hidden="true">↓</span></a></div>
+          </section>
+
+          <section class="card integration-card" aria-labelledby="integration-title">
+            <div class="card-heading"><div><p class="eyebrow">03 / CONNECT</p><h2 id="integration-title">接入 ST-iPhonie</h2></div><span class="card-tag">Fish Audio 引擎</span></div>
+            <div class="copy-field"><label for="relay-endpoint">中转地址</label><div class="copy-input"><input id="relay-endpoint" readonly spellcheck="false" placeholder="加载中"><button class="copy-button" type="button" data-copy="relay-endpoint" aria-label="复制中转地址" disabled>复制</button></div></div>
+            <div class="copy-field" id="lan-endpoint-field" hidden><label for="lan-endpoint">手机酒馆中转地址</label><div class="copy-input"><input id="lan-endpoint" readonly spellcheck="false" placeholder="加载中"><button class="copy-button" type="button" data-copy="lan-endpoint" aria-label="复制手机酒馆中转地址" disabled>复制</button></div><p class="field-note">手机酒馆填这个地址；手机与本机需连同一个 Wi-Fi。</p></div>
+            <div class="copy-field"><div class="label-line"><label for="relay-key">中转专用 KEY</label><button id="toggle-relay-key" class="text-button" type="button" aria-controls="relay-key" aria-pressed="false" disabled>显示</button></div><div class="copy-input"><input id="relay-key" type="password" readonly autocomplete="off" spellcheck="false" placeholder="加载中"><button class="copy-button" type="button" data-copy="relay-key" aria-label="复制中转专用 KEY" disabled>复制</button></div><p class="field-note">将这个 KEY 填入酒馆的 API Key 字段。</p></div>
+            <div class="connection-pair"><div class="copy-field"><label for="relay-model">模型</label><div class="copy-input"><input id="relay-model" readonly spellcheck="false" placeholder="加载中"><button class="copy-button" type="button" data-copy="relay-model" aria-label="复制模型" disabled>复制</button></div></div><div class="copy-field"><label for="relay-voices">默认音色 ID</label><div class="copy-input"><input id="relay-voices" readonly spellcheck="false" placeholder="先保存音色 ID"><button class="copy-button" type="button" data-copy="relay-voices" aria-label="复制默认音色 ID" disabled>复制</button></div></div></div>
+            <details class="connection-guide" open><summary>接入步骤</summary><ol><li>打开 ST-iPhonie 的<strong>引擎 → Fish Audio</strong>，API Key 填上面的中转专用 KEY 并保存。</li><li>填入上面的中转地址，点击「使用中转」或「保存中转」。将「中转接口格式」设为 <strong>OpenAI 格式（/v1/audio/speech）</strong>。</li><li>模型选上面的模型，音频格式选 MP3。点击「测试连接」；空请求返回 400 是正常的，不消耗生成额度。</li><li>在插件的角色设置中选择 Fish Audio，音色填上面的 32 位 ID；不同角色可以填各自的 Fish 音色 ID。</li><li>保持中转、Fish 标签页和连接窗口运行，再试听一句。套餐余额在本页查看；此接法不支持参考音频上传。</li></ol><p class="field-note">电脑上用 http://localhost:8000 或 http://127.0.0.1:8000 打开酒馆，填上面的「中转地址」；手机酒馆改填「手机酒馆中转地址」（该地址需用 Start-手机可用.bat 启动后才会出现）。</p></details>
+          </section>
+        </div>
+      </div>
+      <footer class="page-footer"><span class="footer-dot" aria-hidden="true"></span> 本机管理 · Fish Audio 订阅中转 · OpenAI 兼容语音接口</footer>
+    </main>
+  </body>
+</html>

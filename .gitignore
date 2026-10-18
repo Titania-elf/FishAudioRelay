@@ -1,0 +1,25 @@
+# 本机运行时数据：加密后的 KEY、音色配置、Fish 登录态
+data/
+
+# 依赖
+node_modules/
+
+# 日志
+*.log
+
+# 下载的第三方网页脚本（仅供本地研究，不随仓库分发）
+/research/fish-web/
+
+# 本机验证记录（含账号额度信息，不公开）
+/research/web-subscription.md
+
+# 本地临时文件
+*.bak
+*.tmp
+.env
+.env.*
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db
+desktop.ini
